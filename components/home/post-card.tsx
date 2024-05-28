@@ -1,4 +1,8 @@
-import { isSaved, savePost, removeSavedPost } from "@/actions/post";
+import {
+  savePost,
+  removeSavedPost,
+  getSavedPosts,
+} from "@/actions/post";
 import {
   Card,
   CardContent,
@@ -18,10 +22,18 @@ import { Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function PostCard({ post }: { post: Post }) {
-  const { data: saved } = useQuery({
-    queryKey: ["is-saved", post.id],
-    queryFn: () => isSaved(post.id),
+export default function PostCard({
+  post,
+  saved,
+}: {
+  post: Post;
+  saved: boolean;
+}) {
+  const {
+    data: savedPosts,
+  } = useQuery({
+    queryKey: ["saved-posts"],
+    queryFn: () => getSavedPosts(),
   });
 
   const queryClient = useQueryClient();
@@ -36,14 +48,38 @@ export default function PostCard({ post }: { post: Post }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["is-saved", post.id],
+        queryKey: ["saved-posts"],
       });
     },
     onMutate: () => {
-      queryClient.setQueryData(["is-saved", post.id], !saved);
+      if (saved) {
+        queryClient.setQueryData(
+          ["saved-posts"],
+          (savedPosts ?? []).filter(
+            (savedPost: Post) => savedPost.id !== post.id
+          )
+        );
+      } else {
+        queryClient.setQueryData(
+          ["saved-posts"],
+          [...(savedPosts ?? []), post]
+        );
+      }
     },
     onError: () => {
-      queryClient.setQueryData(["is-saved", post.id], saved);
+      if (saved) {
+        queryClient.setQueryData(
+          ["saved-posts"],
+          (savedPosts ?? []).filter(
+            (savedPost: Post) => savedPost.id !== post.id
+          )
+        );
+      } else {
+        queryClient.setQueryData(
+          ["saved-posts"],
+          [...(savedPosts ?? []), post]
+        );
+      }
     },
   });
 
@@ -73,9 +109,9 @@ export default function PostCard({ post }: { post: Post }) {
             <Tooltip>
               <TooltipTrigger>
                 <div
-                  onClick={() => {
-                    mutation.mutate();
-                  }}
+                onClick={() => {
+                  mutation.mutate();
+                }}
                 >
                   {saved ? (
                     <Star

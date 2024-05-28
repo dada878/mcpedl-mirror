@@ -1,9 +1,10 @@
 "use client";
 
-import { getPosts } from "@/actions/post";
+import { getPosts, getSavedPosts } from "@/actions/post";
 import PostCard from "@/components/home/post-card";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
 import { useRef } from "react";
 import { useState } from "react";
@@ -19,6 +20,13 @@ export default function InfiniteLoader({
   const [hasMore, setHasMore] = useState(true);
 
   const fetchedPages = useRef<number[]>([]);
+
+  const {
+    data: savedPosts,
+  } = useQuery({
+    queryKey: ["saved-posts"],
+    queryFn: () => getSavedPosts(),
+  });
 
   function loadMore() {
     if (fetchedPages.current.includes(page)) {
@@ -43,7 +51,14 @@ export default function InfiniteLoader({
         hasMore={true}
       >
         {items.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard
+            key={post.id}
+            post={post}
+            saved={
+              (savedPosts ?? []).filter((savedPost: Post) => savedPost.id === post.id)
+                .length > 0
+            }
+          />
         ))}
       </InfiniteScroll>
       <div>
@@ -53,7 +68,10 @@ export default function InfiniteLoader({
               hidden: !hasMore,
             })}
           >
-            <LoaderCircle size="24" className={cn("animate-spin text-muted-foreground", {})} />
+            <LoaderCircle
+              size="24"
+              className={cn("animate-spin text-muted-foreground", {})}
+            />
           </div>
         ) : (
           <div className="text-center pb-8 text-muted-foreground">

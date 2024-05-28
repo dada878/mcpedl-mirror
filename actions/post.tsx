@@ -4,18 +4,51 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
 import { getServerSession } from "next-auth";
 
+export async function getSavedPosts() : Promise<Post[]> {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return [];
+  }
+
+  const rawData = (await db.collection("saved").doc(session.user.id).get()).data()?.posts ?? [];
+
+  const savedPosts = rawData.map((post: any) => {
+    return {
+      id: post.id,
+      title: post.title,
+      description: post.description,
+      date: post.date.toDate(),
+      image: post.image,
+      link: post.link,
+      index: post.index,
+    };
+  });
+
+  return savedPosts;
+}
+
+async function getPost(postId: string) {
+  const doc = await db.collection("posts").where("id", "==", postId).get();
+  if (doc.empty) {
+    return null;
+  }
+  return doc.docs[0].data();
+}
+
 export async function removeSavedPost(postId: string) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
     return;
   }
-  const snapshot = await db
-    .collection("saved")
-    .where("postId", "==", postId)
-    .where("userId", "==", session.user.id)
-    .get();
-  snapshot.docs.forEach((doc) => {
-    doc.ref.delete();
+  
+  const savedPosts = (await db.collection("saved").doc(session.user.id).get()).data()?.posts ?? [];
+
+  if (!savedPosts.filter((post: Post) => post.id === postId).length) {
+    return;
+  }
+
+  await db.collection("saved").doc(session.user.id).set({
+    posts: savedPosts.filter((post: Post) => post.id !== postId),
   });
 }
 
@@ -24,9 +57,15 @@ export async function savePost(postId: string) {
   if (!session || !session.user) {
     return;
   }
-  await db.collection("saved").add({
-    postId,
-    userId: session.user.id,
+
+  const savedPosts = (await db.collection("saved").doc(session.user.id).get()).data()?.posts ?? [];
+
+  if (savedPosts.filter((post: Post) => post.id === postId).length) {
+    return;
+  }
+
+  await db.collection("saved").doc(session.user.id).set({
+    posts: [...savedPosts, await getPost(postId)],
   });
 }
 
@@ -35,12 +74,10 @@ export async function isSaved(postId: string) {
   if (!session || !session.user) {
     return false;
   }
-  const snapshot = await db
-    .collection("saved")
-    .where("postId", "==", postId)
-    .where("userId", "==", session.user.id)
-    .get();
-  return snapshot.docs.length > 0;
+
+  const savedPosts = (await db.collection("saved").doc(session.user.id).get()).data()?.posts ?? [];
+
+  return savedPosts.filter((post: Post) => post.id === postId).length > 0;
 }
 
 export async function getPosts(
