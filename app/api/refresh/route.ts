@@ -1,3 +1,4 @@
+import { db } from "@/lib/firebase-admin";
 import jsdom from "jsdom";
 
 const url = "https://mcpedl.com/category/mods/";
@@ -15,7 +16,7 @@ export async function GET() {
     const link = titleElement?.getAttribute("href")
       ? titleElement.getAttribute("href")
       : "No link";
-    const id = link?.replaceAll("/", "");
+    const id = link ? link.replaceAll("/", "") : "No link";
     const imageElement = element.querySelector(
       ".post__img__static.cursor-pointer img"
     );
@@ -29,8 +30,12 @@ export async function GET() {
       ? publishDateElement.textContent?.replaceAll("Published on ", "").trim()
       : "No publish date";
 
-    const descriptionElement = element.querySelector(".fancybox__content__description.cursor-pointer");
-    const description = descriptionElement?.textContent ? descriptionElement.textContent.trim() : "No description";
+    const descriptionElement = element.querySelector(
+      ".fancybox__content__description.cursor-pointer"
+    );
+    const description = descriptionElement?.textContent
+      ? descriptionElement.textContent.trim()
+      : "No description";
 
     if (
       publishDate === "No publish date" ||
@@ -38,7 +43,13 @@ export async function GET() {
       id === "No link" ||
       title === "No title" ||
       image === "/no-image.png" ||
-      description === "No description"
+      description === "No description" ||
+      !publishDate ||
+      !link ||
+      !id ||
+      !title ||
+      !image ||
+      !description
     ) {
       continue;
     }
@@ -46,15 +57,21 @@ export async function GET() {
     posts.push({
       title,
       id,
-      link: `https://mcpedl.com/${link}`,
+      link: `https://mcpedl.com${link}`,
       image,
-      date: publishDate,
+      date: new Date(publishDate),
       description,
     });
+
+    for (const post of posts) {
+      db.collection("posts").doc(post.id).set(post, { merge: true });
+    }
   }
 
   const time = await getTime();
-  return Response.json(posts);
+  return Response.json({
+    datetime: time,
+  });
 }
 
 async function getTime() {
