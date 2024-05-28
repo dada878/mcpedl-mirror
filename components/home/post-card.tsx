@@ -7,6 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Star } from "lucide-react";
 import Image from "next/image";
@@ -63,22 +69,31 @@ export default function PostCard({ post }: { post: Post }) {
           {post.date.toISOString().split("T")[0].replaceAll("-", " / ")}
         </small>
         <div className="flex justify-end gap-2 w-full">
-          <div
-            onClick={() => {
-              mutation.mutate();
-            }}
-          >
-            {saved ? (
-              <Star
-                size={26}
-                className="cursor-pointer"
-                fill="#ffd363"
-                color="#f3ab4e"
-              />
-            ) : (
-              <Star size={26} className="cursor-pointer" />
-            )}
-          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <div
+                  onClick={() => {
+                    mutation.mutate();
+                  }}
+                >
+                  {saved ? (
+                    <Star
+                      size={26}
+                      className="cursor-pointer"
+                      fill="#ffd363"
+                      color="#f3ab4e"
+                    />
+                  ) : (
+                    <Star size={26} className="cursor-pointer" />
+                  )}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>收藏</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </CardFooter>
     </Card>
