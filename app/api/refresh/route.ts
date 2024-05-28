@@ -98,6 +98,7 @@ export async function GET() {
           description,
           index: ++lastIndex,
           type,
+          popularity: 0,
         });
 
         for (const post of posts) {
