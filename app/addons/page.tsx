@@ -17,17 +17,17 @@ export default function Page() {
   const fetchedPages = useRef<number[]>([]);
 
   function loadMore() {
+    if (fetchedPages.current.includes(page)) {
+      return;
+    }
+    fetchedPages.current.push(page);
     getPosts(page, "addon").then((data) => {
       if (data.length === 0) {
         setHasMore(false);
         return;
       }
-      if (fetchedPages.current.includes(page)) {
-        return;
-      }
-      fetchedPages.current.push(page);
-      setPage(p => p + 1);
-      setItems(items => [...items, ...data]);
+      setPage((p) => p + 1);
+      setItems((items) => [...items, ...data]);
     });
   }
 
@@ -47,7 +47,7 @@ export default function Page() {
       }
     >
       {items.map((post) => (
-        <PostCard key={post.id} saved={false} post={post} />
+        <PostCard key={post.id} post={post} />
       ))}
     </InfiniteScroll>
   );
