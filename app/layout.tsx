@@ -4,6 +4,7 @@ import "./globals.css";
 import QueryProvider from "@/components/providers/react-query";
 import Navbar from "@/components/layout/navbar";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,6 +30,7 @@ export default function RootLayout({
           >
             <Navbar />
             <main className="container">{children}</main>
+            <Toaster />
           </ThemeProvider>
         </QueryProvider>
       </body>

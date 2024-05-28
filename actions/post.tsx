@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth";
 export async function getSavedPosts() : Promise<Post[]> {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
-    return [];
+    throw new Error("請先登入");
   }
 
   const rawData = (await db.collection("saved").doc(session.user.id).get()).data()?.posts ?? [];
@@ -38,7 +38,7 @@ async function getPost(postId: string) {
 export async function removeSavedPost(postId: string) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
-    return;
+    throw new Error("請先登入");
   }
   
   const savedPosts = (await db.collection("saved").doc(session.user.id).get()).data()?.posts ?? [];
@@ -55,7 +55,7 @@ export async function removeSavedPost(postId: string) {
 export async function savePost(postId: string) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
-    return;
+    throw new Error("請先登入");
   }
 
   const savedPosts = (await db.collection("saved").doc(session.user.id).get()).data()?.posts ?? [];

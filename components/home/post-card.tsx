@@ -17,6 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useToast } from "@/components/ui/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Star } from "lucide-react";
 import Image from "next/image";
@@ -37,6 +38,7 @@ export default function PostCard({
   });
 
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -66,7 +68,12 @@ export default function PostCard({
         );
       }
     },
-    onError: () => {
+    onError: (error) => {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        description: `錯誤：${error.message}`,
+      });
       if (saved) {
         queryClient.setQueryData(
           ["saved-posts"],
@@ -82,6 +89,7 @@ export default function PostCard({
       }
     },
   });
+
 
   return (
     <Card className="w-82 flex flex-col h-full transition justify-between">
