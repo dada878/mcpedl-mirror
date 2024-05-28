@@ -8,6 +8,9 @@ export async function GET() {
   const dom = new jsdom.JSDOM(result);
   const elements = dom.window.document.querySelectorAll("div.fancybox.post");
 
+  const lastQuerySnapshot = await db.collection("posts").orderBy("index", "desc").limit(1).get();
+  let lastIndex = lastQuerySnapshot.docs.length > 0 ? lastQuerySnapshot.docs[0].data().index : 0;
+
   const posts = [];
 
   for (const element of Array.from(elements)) {
@@ -61,10 +64,14 @@ export async function GET() {
       image,
       date: new Date(publishDate),
       description,
+      index: ++lastIndex,
     });
 
     for (const post of posts) {
-      db.collection("posts").doc(post.id).set(post, { merge: true });
+      const existingPost = await db.collection("posts").doc(post.id).get();
+      if (!existingPost.exists) {
+        db.collection("posts").doc(post.id).set(post, { merge: true });
+      }
     }
   }
 
