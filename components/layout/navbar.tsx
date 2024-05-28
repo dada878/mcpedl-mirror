@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { signIn, signOut } from "next-auth/react";
 import { ModeToggle } from "../navbar/theme-selector";
 
 export default function Navbar() {
@@ -60,14 +61,18 @@ export default function Navbar() {
                     <Link href="/saved">
                       <Button variant={"ghost"}>我的收藏</Button>
                     </Link>
-                    <Button variant={"ghost"}>登出</Button>
+                    <Button onClick={() => {
+                      signOut();
+                    }} variant={"ghost"}>登出</Button>
                   </PopoverContent>
                 </Popover>
               </li>
             </>
           ) : (
             <li>
-              <Link href="/login">登入</Link>
+              <Link href={"#"} onClick={() => {
+                signIn();
+              }}>登入</Link>
             </li>
           )}
            <li>
