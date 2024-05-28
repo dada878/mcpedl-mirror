@@ -11,30 +11,45 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { signIn, signOut } from "next-auth/react";
 import { ModeToggle } from "../navbar/theme-selector";
+import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const { data: session } = useQuery({
     queryFn: () => getSession(),
     queryKey: ["session"],
   });
+  const pathname = usePathname();
   const user = session?.user;
   return (
     <nav className="container border-b sticky top-0 bg-card">
       <ul className="flex justify-between items-center">
         <div className="flex p-4 gap-5">
           <li>
-            <Link className="hover:underline underline-offset-2" href="/addons">
+            <Link
+              className={cn("hover:underline underline-offset-2", {
+                underline: pathname.startsWith("/addons"),
+              })}
+              href="/addons"
+            >
               Addons
             </Link>
           </li>
           <li>
-            <Link className="hover:underline underline-offset-2" href="/maps">
+            <Link
+              className={cn("hover:underline underline-offset-2", {
+                underline: pathname.startsWith("/maps"),
+              })}
+              href="/maps"
+            >
               Maps
             </Link>
           </li>
           <li>
             <Link
-              className="hover:underline underline-offset-2"
+              className={cn("hover:underline underline-offset-2", {
+                underline: pathname.startsWith("/textures"),
+              })}
               href="/textures"
             >
               Textures
@@ -42,7 +57,6 @@ export default function Navbar() {
           </li>
         </div>
         <div className="flex p-2 gap-5 items-center">
-         
           {user ? (
             <>
               <li className="flex items-center justify-center gap-2">
@@ -61,21 +75,31 @@ export default function Navbar() {
                     <Link href="/saved">
                       <Button variant={"ghost"}>我的收藏</Button>
                     </Link>
-                    <Button onClick={() => {
-                      signOut();
-                    }} variant={"ghost"}>登出</Button>
+                    <Button
+                      onClick={() => {
+                        signOut();
+                      }}
+                      variant={"ghost"}
+                    >
+                      登出
+                    </Button>
                   </PopoverContent>
                 </Popover>
               </li>
             </>
           ) : (
             <li>
-              <Link href={"#"} onClick={() => {
-                signIn();
-              }}>登入</Link>
+              <Link
+                href={"#"}
+                onClick={() => {
+                  signIn();
+                }}
+              >
+                登入
+              </Link>
             </li>
           )}
-           <li>
+          <li>
             <ModeToggle />
           </li>
         </div>
