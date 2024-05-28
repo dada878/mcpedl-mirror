@@ -5,6 +5,7 @@ import PostCard from "@/components/home/post-card";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LoaderCircle } from "lucide-react";
+import { useRef } from "react";
 import { useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 
@@ -13,15 +14,20 @@ export default function Page() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
+  const fetchedPages = useRef<number[]>([]);
+
   function loadMore() {
-    console.log("load more");
-    getPosts(page).then((data) => {
+    getPosts(page, "addon").then((data) => {
       if (data.length === 0) {
         setHasMore(false);
         return;
       }
-      setPage((p) => p + 1);
-      setItems([...items, ...data]);
+      if (fetchedPages.current.includes(page)) {
+        return;
+      }
+      fetchedPages.current.push(page);
+      setPage(p => p + 1);
+      setItems(items => [...items, ...data]);
     });
   }
 
@@ -41,7 +47,7 @@ export default function Page() {
       }
     >
       {items.map((post) => (
-        <PostCard key={post.id} post={post} />
+        <PostCard key={post.id} saved={false} post={post} />
       ))}
     </InfiniteScroll>
   );
