@@ -1,8 +1,7 @@
 "use client";
 
-import { getPosts, getSavedPosts } from "@/actions/post";
+import { getPosts, getSavedPosts, getTopPopularPosts } from "@/actions/post";
 import PostCard from "@/components/home/post-card";
-import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
@@ -13,7 +12,7 @@ import InfiniteScroll from "react-infinite-scroller";
 export default function InfiniteLoader({
   type,
 }: {
-  type: "addon" | "map" | "texture";
+  type: "addon" | "map" | "texture" | "popular";
 }) {
   const [items, setItems] = useState<Post[]>([]);
   const [page, setPage] = useState(1);
@@ -21,9 +20,7 @@ export default function InfiniteLoader({
 
   const fetchedPages = useRef<number[]>([]);
 
-  const {
-    data: savedPosts,
-  } = useQuery({
+  const { data: savedPosts } = useQuery({
     queryKey: ["saved-posts"],
     queryFn: () => getSavedPosts(),
   });
@@ -33,14 +30,26 @@ export default function InfiniteLoader({
       return;
     }
     fetchedPages.current.push(page);
-    getPosts(page, type).then((data) => {
-      if (data.length === 0) {
-        setHasMore(false);
-        return;
-      }
-      setPage((p) => p + 1);
-      setItems((items) => [...items, ...data]);
-    });
+
+    if (type === "popular") {
+      getTopPopularPosts(page * 10).then((data) => {
+        if (data.length === items.length) {
+          setHasMore(false);
+          return;
+        }
+        setPage((p) => p + 1);
+        setItems(data);
+      });
+    } else {
+      getPosts(page, type).then((data) => {
+        if (data.length === 0) {
+          setHasMore(false);
+          return;
+        }
+        setPage((p) => p + 1);
+        setItems((items) => [...items, ...data]);
+      });
+    }
   }
 
   return (
@@ -55,8 +64,9 @@ export default function InfiniteLoader({
             key={post.id}
             post={post}
             saved={
-              (savedPosts ?? []).filter((savedPost: Post) => savedPost.id === post.id)
-                .length > 0
+              (savedPosts ?? []).filter(
+                (savedPost: Post) => savedPost.id === post.id
+              ).length > 0
             }
           />
         ))}
