@@ -2,7 +2,29 @@
 
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import { getServerSession } from "next-auth";
+
+export async function getTopPopularPosts(limit: number = 10) {
+  const snapshot = await db
+    .collection("posts")
+    .orderBy("popularity", "desc")
+    .limit(limit)
+    .get();
+  const posts = snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      title: data.title,
+      description: data.description,
+      date: data.date.toDate(),
+      image: data.image,
+      link: data.link,
+      index: data.index,
+    };
+  });
+  return posts;
+}
 
 export async function getSavedPosts() : Promise<Post[]> {
   const session = await getServerSession(authOptions);
@@ -50,6 +72,10 @@ export async function removeSavedPost(postId: string) {
   await db.collection("saved").doc(session.user.id).set({
     posts: savedPosts.filter((post: Post) => post.id !== postId),
   });
+
+  await db.collection("posts").doc(postId).update({
+    popularity: FieldValue.increment(-1),
+  });
 }
 
 export async function savePost(postId: string) {
@@ -66,6 +92,10 @@ export async function savePost(postId: string) {
 
   await db.collection("saved").doc(session.user.id).set({
     posts: [...savedPosts, await getPost(postId)],
+  });
+
+  await db.collection("posts").doc(postId).update({
+    popularity: FieldValue.increment(1),
   });
 }
 
