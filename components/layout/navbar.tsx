@@ -22,7 +22,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const user = session?.user;
   return (
-    <nav className="container border-b sticky top-0 bg-card">
+    <nav className="container border-b sticky top-0 bg-card left-0 right-0 w-full">
       <ul className="flex justify-between items-center">
         <div className="flex p-4 gap-5">
           <li>
@@ -32,7 +32,7 @@ export default function Navbar() {
               })}
               href="/"
             >
-              Home
+              Popular
             </Link>
           </li>
           <li>
