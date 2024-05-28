@@ -2,9 +2,10 @@
 
 import { db } from "@/lib/firebase-admin";
 
-export async function getPosts(page: number = 1): Promise<Post[]> {
+export async function getPosts(page: number = 1, type: string): Promise<Post[]> {
   const lastQuerySnapshot = await db
     .collection("posts")
+    .where("type", "==", type)
     .orderBy("index", "desc")
     .limit(1)
     .get();
@@ -17,6 +18,7 @@ export async function getPosts(page: number = 1): Promise<Post[]> {
   const endIndex = lastIndex - page * postsPerPage;
   const snapshot = await db
     .collection("posts")
+    .where("type", "==", type)
     .orderBy("index", "desc")
     .startAt(startIndex)
     .endBefore(endIndex)

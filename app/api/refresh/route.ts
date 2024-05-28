@@ -65,6 +65,7 @@ export async function GET() {
       date: new Date(publishDate),
       description,
       index: ++lastIndex,
+      type: "addon"
     });
 
     for (const post of posts) {
