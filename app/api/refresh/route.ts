@@ -29,11 +29,16 @@ export async function GET() {
       ? publishDateElement.textContent?.replaceAll("Published on ", "").trim()
       : "No publish date";
 
+    const descriptionElement = element.querySelector(".fancybox__content__description.cursor-pointer");
+    const description = descriptionElement?.textContent ? descriptionElement.textContent.trim() : "No description";
+
     if (
       publishDate === "No publish date" ||
       link === "No link" ||
       id === "No link" ||
-      title === "No title"
+      title === "No title" ||
+      image === "/no-image.png" ||
+      description === "No description"
     ) {
       continue;
     }
@@ -44,6 +49,7 @@ export async function GET() {
       link: `https://mcpedl.com/${link}`,
       image,
       date: publishDate,
+      description,
     });
   }
 
