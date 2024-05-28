@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { ModeToggle } from "../navbar/theme-selector";
 
 export default function Navbar() {
   const { data: session } = useQuery({
@@ -40,6 +41,7 @@ export default function Navbar() {
           </li>
         </div>
         <div className="flex p-2 gap-5 items-center">
+         
           {user ? (
             <>
               <li className="flex items-center justify-center gap-2">
@@ -68,6 +70,9 @@ export default function Navbar() {
               <Link href="/login">登入</Link>
             </li>
           )}
+           <li>
+            <ModeToggle />
+          </li>
         </div>
       </ul>
     </nav>
