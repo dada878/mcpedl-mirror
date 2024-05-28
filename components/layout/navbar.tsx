@@ -28,6 +28,16 @@ export default function Navbar() {
           <li>
             <Link
               className={cn("hover:underline underline-offset-2", {
+                underline: pathname === "/",
+              })}
+              href="/"
+            >
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link
+              className={cn("hover:underline underline-offset-2", {
                 underline: pathname.startsWith("/addons"),
               })}
               href="/addons"
