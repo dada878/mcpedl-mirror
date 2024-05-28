@@ -20,6 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="https://raw.githubusercontent.com/dada878/mcpedl-mirror/main/public/favicon.ico" />
+      </head>
       <body className={inter.className}>
         <QueryProvider>
           <ThemeProvider
