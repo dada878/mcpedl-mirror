@@ -3,12 +3,12 @@ import jsdom from "jsdom";
 
 const urls = [
   {
-    url: "https://mcpedl.com/category/mods/",
-    type: "addon",
-  },
-  {
     url: "https://mcpedl.com/category/maps/",
     type: "map",
+  },
+  {
+    url: "https://mcpedl.com/category/mods/",
+    type: "addon",
   },
   {
     url: "https://mcpedl.com/category/texture-packs/",
