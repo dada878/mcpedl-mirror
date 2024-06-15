@@ -69,7 +69,6 @@ export default function PostCard({
       }
     },
     onError: (error) => {
-      console.error(error);
       toast({
         variant: "destructive",
         description: `錯誤：${error.message}`,

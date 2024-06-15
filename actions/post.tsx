@@ -26,25 +26,33 @@ export async function getTopPopularPosts(limit: number = 10) {
   return posts;
 }
 
-export async function getSavedPosts() : Promise<Post[]> {
+export async function getSavedPosts(): Promise<Post[]> {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
     throw new Error("請先登入");
   }
 
-  const rawData = (await db.collection("saved").doc(session.user.id).get()).data()?.posts ?? [];
+  const rawData =
+    (await db.collection("saved").doc(session.user.id).get()).data()?.posts ??
+    [];
 
-  const savedPosts = rawData.map((post: any) => {
-    return {
-      id: post.id,
-      title: post.title,
-      description: post.description,
-      date: post.date.toDate(),
-      image: post.image,
-      link: post.link,
-      index: post.index,
-    };
-  });
+  const savedPosts = await Promise.all(
+    rawData.map(async (postReference: any) => {
+      return new Promise(async (resolve) => {
+        const postDocument = await postReference.get();
+        const post = postDocument.data();
+        resolve({
+          id: post.id,
+          title: post.title,
+          description: post.description,
+          date: post.date.toDate(),
+          image: post.image,
+          link: post.link,
+          index: post.index,
+        });
+      });
+    })
+  );
 
   return savedPosts;
 }
@@ -62,20 +70,28 @@ export async function removeSavedPost(postId: string) {
   if (!session || !session.user) {
     throw new Error("請先登入");
   }
-  
-  const savedPosts = (await db.collection("saved").doc(session.user.id).get()).data()?.posts ?? [];
+
+  const savedPosts =
+    (await db.collection("saved").doc(session.user.id).get()).data()?.posts ??
+    [];
 
   if (!savedPosts.filter((post: Post) => post.id === postId).length) {
     return;
   }
 
-  await db.collection("saved").doc(session.user.id).set({
-    posts: savedPosts.filter((post: Post) => post.id !== postId),
-  });
+  await db
+    .collection("saved")
+    .doc(session.user.id)
+    .set({
+      posts: savedPosts.filter((post: Post) => post.id !== postId),
+    });
 
-  await db.collection("posts").doc(postId).update({
-    popularity: FieldValue.increment(-1),
-  });
+  await db
+    .collection("posts")
+    .doc(postId)
+    .update({
+      popularity: FieldValue.increment(-1),
+    });
 }
 
 export async function savePost(postId: string) {
@@ -84,19 +100,29 @@ export async function savePost(postId: string) {
     throw new Error("請先登入");
   }
 
-  const savedPosts = (await db.collection("saved").doc(session.user.id).get()).data()?.posts ?? [];
+  const savedPosts =
+    (await db.collection("saved").doc(session.user.id).get()).data()?.posts ??
+    [];
 
   if (savedPosts.filter((post: Post) => post.id === postId).length) {
     return;
   }
 
-  await db.collection("saved").doc(session.user.id).set({
-    posts: [...savedPosts, await getPost(postId)],
-  });
+  await db
+    .collection("saved")
+    .doc(session.user.id)
+    .set({
+      posts: [...savedPosts, 
+        db.collection("posts").doc(postId)
+      ],
+    });
 
-  await db.collection("posts").doc(postId).update({
-    popularity: FieldValue.increment(1),
-  });
+  await db
+    .collection("posts")
+    .doc(postId)
+    .update({
+      popularity: FieldValue.increment(1),
+    });
 }
 
 export async function isSaved(postId: string) {
@@ -105,7 +131,9 @@ export async function isSaved(postId: string) {
     return false;
   }
 
-  const savedPosts = (await db.collection("saved").doc(session.user.id).get()).data()?.posts ?? [];
+  const savedPosts =
+    (await db.collection("saved").doc(session.user.id).get()).data()?.posts ??
+    [];
 
   return savedPosts.filter((post: Post) => post.id === postId).length > 0;
 }
