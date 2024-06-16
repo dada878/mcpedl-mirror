@@ -22,47 +22,47 @@ export default function Navbar() {
   const pathname = usePathname();
   const user = session?.user;
   return (
-    <nav className="container border-b sticky top-0 bg-card left-0 right-0 w-full">
+    <nav className="container px-10 border-b sticky top-0 bg-card left-0 right-0 w-full">
       <ul className="flex justify-between items-center">
-        <div className="flex p-4 gap-5">
+        <div className="flex p-4 gap-8">
           <li>
             <Link
-              className={cn("hover:underline underline-offset-2", {
+              className={cn("hover:underline underline-offset-4", {
                 underline: pathname === "/",
               })}
               href="/"
             >
-              Popular
+              熱門內容
             </Link>
           </li>
           <li>
             <Link
-              className={cn("hover:underline underline-offset-2", {
+              className={cn("hover:underline underline-offset-4", {
                 underline: pathname.startsWith("/addons"),
               })}
               href="/addons"
             >
-              Addons
+              模組
             </Link>
           </li>
           <li>
             <Link
-              className={cn("hover:underline underline-offset-2", {
+              className={cn("hover:underline underline-offset-4", {
                 underline: pathname.startsWith("/maps"),
               })}
               href="/maps"
             >
-              Maps
+              地圖
             </Link>
           </li>
           <li>
             <Link
-              className={cn("hover:underline underline-offset-2", {
+              className={cn("hover:underline underline-offset-4", {
                 underline: pathname.startsWith("/textures"),
               })}
               href="/textures"
             >
-              Textures
+              材質包
             </Link>
           </li>
         </div>
