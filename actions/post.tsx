@@ -13,15 +13,17 @@ export async function getTopPopularPosts(limit: number = 10) {
     .get();
   const posts = snapshot.docs.map((doc) => {
     const data = doc.data();
-    return {
-      id: doc.id,
-      title: data.title,
-      description: data.description,
-      date: data.date.toDate(),
-      image: data.image,
-      link: data.link,
-      index: data.index,
-    };
+    if (data) {
+      return {
+        id: doc.id,
+        title: data.title,
+        description: data.description,
+        date: data.date.toDate(),
+        image: data.image,
+        link: data.link,
+        index: data.index,
+      };
+    }
   });
   return posts;
 }
@@ -41,20 +43,24 @@ export async function getSavedPosts(): Promise<Post[]> {
       return new Promise(async (resolve) => {
         const postDocument = await postReference.get();
         const post = postDocument.data();
-        resolve({
-          id: post.id,
-          title: post.title,
-          description: post.description,
-          date: post.date.toDate(),
-          image: post.image,
-          link: post.link,
-          index: post.index,
-        });
+        if (post) {
+          resolve({
+            id: post.id,
+            title: post.title,
+            description: post.description,
+            date: post.date.toDate(),
+            image: post.image,
+            link: post.link,
+            index: post.index,
+          });
+        } else {
+          resolve(null);
+        }
       });
     })
   );
 
-  return savedPosts;
+  return savedPosts.filter((post: Post | null) => post !== null);
 }
 
 async function getPost(postId: string) {
