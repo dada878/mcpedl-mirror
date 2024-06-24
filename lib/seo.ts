@@ -1,7 +1,7 @@
 const BASE_URL = "https://mcpedl.dada878.com";
 
 const siteName = "MCPEDL Mirror";
-const description = "MCPEDL Mirror is a mirror site for MCPEDL.com, a website that provides a lot of mods, maps, and resource packs for Minecraft Bedrock Edition. MCPEDL Mirror is a project that aims to provide a more stable and more feature-rich experience for users in regions where MCPEDL.com is blocked or slow.";
+const description = "跟 MCPEDL 沒差多少，不過沒廣告而且有無限滾動和收藏資源的功能";
 
 const SEO = {
   title: siteName,
