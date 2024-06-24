@@ -1,7 +1,7 @@
 const BASE_URL = "https://mcpedl.dada878.com";
 
 const siteName = "MCPEDL Mirror";
-const description = "跟 MCPEDL 沒差多少，不過沒廣告而且有無限滾動和收藏資源的功能";
+const description = "跟 MCPEDL 沒差多少，不過沒廣告而且有無限滾動和收藏內容的功能。熱門內容是統計本網站資料來排名的，幫忙收臧就可以為你認為優質的內容增加一點的熱門度分數。";
 
 const SEO = {
   title: siteName,
