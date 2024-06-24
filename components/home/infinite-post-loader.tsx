@@ -38,7 +38,8 @@ export default function InfiniteLoader({
           return;
         }
         setPage((p) => p + 1);
-        setItems(data);
+        setItems(data.filter((post) => post !== null && post !== undefined)
+          .map((post) => post as Post));
       });
     } else {
       getPosts(page, type).then((data) => {
