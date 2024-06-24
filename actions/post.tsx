@@ -5,7 +5,9 @@ import { db } from "@/lib/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { getServerSession } from "next-auth";
 
-export async function getTopPopularPosts(limit: number = 10) {
+const POSTS_PER_PAGE = 20;
+
+export async function getTopPopularPosts(limit: number = POSTS_PER_PAGE) {
   const snapshot = await db
     .collection("posts")
     .orderBy("popularity", "desc")
@@ -158,7 +160,7 @@ export async function getPosts(
     lastQuerySnapshot.docs.length > 0
       ? lastQuerySnapshot.docs[0].data().index
       : 0;
-  const postsPerPage = 10;
+  const postsPerPage = POSTS_PER_PAGE;
   const startIndex = lastIndex - (page - 1) * postsPerPage;
   const endIndex = lastIndex - page * postsPerPage;
   const snapshot = await db
